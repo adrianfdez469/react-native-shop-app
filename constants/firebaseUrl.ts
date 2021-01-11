@@ -1,0 +1,1 @@
+export default 'https://react-native-complete-gu-d7ff5-default-rtdb.firebaseio.com/';
