@@ -21,7 +21,7 @@ Notifications.setNotificationHandler({
             shouldShowAlert: true
         }
     }
-})
+});
 
 enableScreens();
 
