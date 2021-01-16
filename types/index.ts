@@ -7,6 +7,7 @@ export interface IProduct {
     imageUrl: string;
     description: string;
     price: number;
+    ownerUserPushToken: string;
 }
 
 export interface ProductsState {

@@ -11,6 +11,17 @@ import ShopNavigator from "./navigation/ShopNavigatior";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
 import { enableScreens } from "react-native-screens";
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => {
+        return {
+            shouldPlaySound: true,
+            shouldSetBadge: true,
+            shouldShowAlert: true
+        }
+    }
+})
 
 enableScreens();
 

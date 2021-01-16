@@ -124,9 +124,11 @@ const EditProduct: FC<PropTypes> = ({ route, navigation }) => {
             price: Number(formState.inputValues.price),
             title: formState.inputValues.title,
             id: route.params.product.id,
+            ownerUserPushToken: route.params.product.ownerUserPushToken
           })
         );
       } else {
+
         await dispatch(
           addProduct({
             id: new Date().getTime().toString(),
@@ -135,6 +137,7 @@ const EditProduct: FC<PropTypes> = ({ route, navigation }) => {
             ownerId: "",
             price: Number(formState.inputValues.price),
             title: formState.inputValues.title,
+            ownerUserPushToken: ''
           })
         );
       }

@@ -1,7 +1,9 @@
 import { ADD_PRODUCT, DELETE_PRODUCT, EDIT_PRODUCT, ProductActions,IProduct, ProductsState, FullReduxState, SET_PRODUCTS } from '../../types';
 import {ThunkAction, ThunkDispatch} from 'redux-thunk';
+import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
 import firebaseUrl from '../../constants/firebaseUrl';
-import Product from '../../models/product';
+import { Alert } from 'react-native';
 
 
 type ThunkResponse = ThunkAction<void, FullReduxState, undefined, ProductActions>
@@ -30,6 +32,29 @@ export const addProduct = (product:IProduct):ThunkResponse => {
     
     return async (dispatch: ThunkDispatch<ProductsState, undefined, ADD_PRODUCT>, getState) => {
         // Async code
+
+        let ownerUserPushToken = null;
+        try{
+            let permissionResp = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+            if(permissionResp.status !== Permissions.PermissionStatus.GRANTED){
+                permissionResp = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+                if(permissionResp.status !== Permissions.PermissionStatus.GRANTED){
+                    const permissionError = new Error('Permissions denied!');
+                    permissionError.name = 'PERMISSION_ERROR';
+                    throw permissionError;
+                }
+            }
+            const expoPushTokenData = await Notifications.getExpoPushTokenAsync();
+            ownerUserPushToken = expoPushTokenData.data;
+
+        }catch(error){
+            if(error.name === 'PERMISSION_ERROR'){
+                Alert.alert(error.message, 'You need to grant permissions access to get notifications!', [{text: 'Okay'}]);
+            }else{
+                console.log(error);
+            }
+        }
+
         const {token, userId} = getState().auth;
         const response = await fetch(`${firebaseUrl}products.json?auth=${token}`, {
             method: 'POST',
@@ -41,7 +66,8 @@ export const addProduct = (product:IProduct):ThunkResponse => {
                 description: product.description,
                 imageUrl: product.imageUrl,
                 ownerId: userId,
-                price: product.price
+                price: product.price,
+                ownerUserPushToken: ownerUserPushToken
             })
         });
         
@@ -98,7 +124,7 @@ export const loadProducts = ():ThunkResponse => {
           throw new Error('Something went wrong');
         }
         const respData = await response.json();
-        let products: Product[] = [];
+        let products: IProduct[] = [];
         if(respData){
           products = Object
             .entries<IProduct>(respData)

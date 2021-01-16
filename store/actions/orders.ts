@@ -36,6 +36,32 @@ export const addOrder = (cartItems: CartProduct[], totalAmount: number):ThunkRes
                 date: date
             }
         });
+
+        // Send a push notification to the products owner
+        const pushTokens:string[] = Array.from(new Set(
+            cartItems.map(cartP => {
+                return cartP.product.ownerUserPushToken;
+            })));
+        try{
+            for(const item of cartItems){
+                await fetch('https://exp.host/--/api/v2/push/send', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Accept-Encoding': 'gzip, deflate',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        to: item.product.ownerUserPushToken,
+                        data: item,
+                        title: 'Order was placed!',
+                        body: `${item.quantity}: ${item.product.title}`
+                    })
+                })
+            }
+        }catch(err){
+            console.log(err);
+        }
     }
 
 }
