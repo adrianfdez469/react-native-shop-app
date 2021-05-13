@@ -8,7 +8,7 @@ export const SignUp = (email:string, password:string) => {
     return async (dispatch:ThunkDispatch<{}, undefined, AUTHENTICATE>) => {
         
         const url = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${GOOGLE_API_KEY}`;
-        const response = await fetch('', {
+        const response = await fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
